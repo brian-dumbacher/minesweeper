@@ -12,10 +12,18 @@
 </div>
 
 <div id="divCanvases" style="position: relative; border: 1px solid #FFFFFF; margin: 0 auto; width: 600px; height: 660px;">
-<canvas id="canvas1" style="z-index: 1; position: absolute; left: 0px; top: 0px;"></canvas>
-<canvas id="canvas2" style="z-index: 2; position: absolute; left: 0px; top: 0px;"></canvas>
-<canvas id="canvas3" style="z-index: 3; position: absolute; left: 0px; top: 0px;"></canvas>
-<canvas id="canvas4" style="z-index: 4; position: absolute; left: 0px; top: 0px;"></canvas>
+	<canvas id="canvas1" style="z-index: 1; position: absolute; left: 0px; top: 0px;"></canvas>
+	<canvas id="canvas2" style="z-index: 2; position: absolute; left: 0px; top: 0px;"></canvas>
+	<canvas id="canvas3" style="z-index: 3; position: absolute; left: 0px; top: 0px;"></canvas>
+	<canvas id="canvas4" style="z-index: 4; position: absolute; left: 0px; top: 0px;"></canvas>
+</div>
+
+<div id="hiddenImages">
+	<img id="imageBackAgain" src="images/backagain.png" style="display: none;">
+	<img id="imageDigits"    src="images/digits.png"    style="display: none;">
+	<img id="imageFaces"     src="images/faces.png"     style="display: none;">
+	<img id="imageIntro"     src="images/intro.png"     style="display: none;">
+	<img id="imageTiles"     src="images/tiles.png"     style="display: none;">
 </div>
 
 <script type="text/javascript">
@@ -104,20 +112,15 @@ function load(){
 	c4             = canvas4.getContext('2d');
 
     // Images
-    imgIntro         = new Image();
-    imgIntro.src     = "images/intro.png";
-	imgTiles         = new Image();
-    imgTiles.src     = "images/tiles.png";
-    imgDigits        = new Image();
-    imgDigits.src    = "images/digits.png";
-    imgFaces         = new Image();
-    imgFaces.src     = "images/faces.png";
-    imgBackAgain     = new Image();
-    imgBackAgain.src = "images/backagain.png";
+    imgIntro     = document.getElementById("imageIntro");
+	imgTiles     = document.getElementById("imageTiles");
+    imgDigits    = document.getElementById("imageDigits");
+    imgFaces     = document.getElementById("imageFaces");
+    imgBackAgain = document.getElementById("imageBackAgain");
 
     // Handler
 	handler = new Handler();
-    imgIntro.onload = function(){handler.openIntro();}
+    handler.openIntro();
 }
 
 /*
