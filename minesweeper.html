@@ -1,4 +1,3 @@
-
 <!DOCTYPE HTML>
 <html>
 <head>
@@ -8,8 +7,21 @@
 
 <body style="background-color: #222222;">
 
+<!--
+####################################
+###   Name:    Minesweeper       ###
+###   Author:  Brian Dumbacher   ###
+####################################
+-->
+
 <div id="divEmpty" style="margin: 0 auto; text-align: center; height: 100px;">
 </div>
+
+<!--
+####################
+###   Canvases   ###
+####################
+-->
 
 <div id="divCanvases" style="position: relative; border: 1px solid #FFFFFF; margin: 0 auto; width: 600px; height: 660px;">
 	<canvas id="canvas1" style="z-index: 1; position: absolute; left: 0px; top: 0px;"></canvas>
@@ -17,6 +29,12 @@
 	<canvas id="canvas3" style="z-index: 3; position: absolute; left: 0px; top: 0px;"></canvas>
 	<canvas id="canvas4" style="z-index: 4; position: absolute; left: 0px; top: 0px;"></canvas>
 </div>
+
+<!--
+#########################
+###   Hidden Images   ###
+#########################
+-->
 
 <div id="divHiddenImages">
 	<img id="imageBackAgain" src="images/backagain.png" style="display: none;">
@@ -128,6 +146,7 @@ Handler
 */
 
 function Handler(){
+	// Initialize handler
 	this.init = function(){
 		this.handlerState      = "limbo";
 		this.dimSelect         = DIM_DEFAULT;
@@ -137,6 +156,7 @@ function Handler(){
 		window.addEventListener("keyup", onKeyUp);
 	}
 
+	// Update style
 	this.updateStyle = function(){
 		this.style++;
 		if (this.style == NUM_STYLES){
@@ -153,6 +173,7 @@ function Handler(){
 		}
 	}
 
+	// Open introduction
 	this.openIntro = function(){
 		this.handlerState = "intro";
 		this.clearBackground();
@@ -161,16 +182,19 @@ function Handler(){
 		this.drawButtons();
 	}
 
+	// Close introduction
 	this.closeIntro = function(){
 		this.handlerState = "limbo";
 		this.clearBackground();
 		this.clearButtons();
 	}
 
+	// Clear buttons
 	this.clearButtons = function(){
 		c4.clearRect(0, 0, STAGE_WIDTH, STAGE_HEIGHT);
 	}
 
+	// Draw buttons
 	this.drawButtons = function(){
 		c4.globalAlpha = 0.5;
 		c4.fillStyle   = COL_WHITE;
@@ -191,15 +215,19 @@ function Handler(){
 		c4.globalAlpha = 1;
 	}
 
+	// Clear backgrouond
 	this.clearBackground = function(){
 		c1.clearRect(0, 0, STAGE_WIDTH, STAGE_HEIGHT);
 	}
 
+	// Draw background
 	this.drawBackground = function(){
+		// Draw background depending on handler state
 		if (this.handlerState == "intro"){
+			// Draw introduction image
 			c1.drawImage(imgIntro, 0, this.style * STAGE_HEIGHT, STAGE_WIDTH, STAGE_HEIGHT, 0, 0, STAGE_WIDTH, STAGE_HEIGHT);
 		} else if (this.handlerState == "play"){
-			// Infobar
+			// Draw infobar
 			if (this.style == 0){
 				c1.fillStyle = COL_GREY;
 			} else if (this.style == 1){
@@ -211,7 +239,7 @@ function Handler(){
 			}
 			c1.fillRect(0, 0, INFOBAR_WIDTH, INFOBAR_HEIGHT);
 
-			// Background
+			// Draw background
 			if (this.style == 0){
 				c1.fillStyle = COL_GREEN;
 			} else if (this.style == 1){
@@ -225,12 +253,14 @@ function Handler(){
 		}
 	}
 
+	// Start new game
 	this.startNewGame = function(){
 		this.handlerState = "play";
 		this.drawBackground();
 		ms = new Minesweeper(this.dimSelect, this.minePercentSelect);
 	}
 
+	// Redo game
 	this.redoGame = function(){
 		ms.endGame();
 		this.handlerState = "play";
@@ -242,7 +272,8 @@ function Handler(){
 		ms = new Minesweeper(this.dimSelect, this.minePercentSelect);
 	}
 
-	this.backToIntro = function(){
+	// Return to introduction
+	this.returnToIntro = function(){
 		ms.endGame();
 		c1.clearRect(0, 0, STAGE_WIDTH, STAGE_HEIGHT);
 		c2.clearRect(0, 0, STAGE_WIDTH, STAGE_HEIGHT);
@@ -258,13 +289,17 @@ function Handler(){
 Event listeners and loops
 */
 
+// On key up
 function onKeyUp(e){
+	// Space bar
 	if (e.keyCode == 32){
 		handler.updateStyle();
 	}
 }
 
+// On mouse up
 function onMouseUp(e){
+	// Perform action depending on handler state and Minesweeper game state
 	if (handler.handlerState == "intro"){
 		var xMouse = e.offsetX;
 		var yMouse = e.offsetY;
@@ -327,7 +362,7 @@ function onMouseUp(e){
 			var xUp = e.offsetX;
 			var yUp = e.offsetY;
 			if (xUp > 221 & xUp < 267 & yUp > 0 & yUp < 60){
-				handler.backToIntro();
+				handler.returnToIntro();
 			} else if (xUp > 333 & xUp < 379 & yUp > 0 & yUp < 60){
 				handler.redoGame();
 			}
@@ -335,6 +370,7 @@ function onMouseUp(e){
 	}
 }
 
+// Timer loop
 function timerLoop(){
 	if (ms.gameState == "play"){
 		if (ms.timer < 999){
@@ -350,6 +386,7 @@ Minesweeper
 */
 
 function Minesweeper(dim, minePercent){
+	// Initialize game of Minesweeper
 	this.init = function(){
 		this.dim               = dim;
 		this.minePercent       = minePercent;
@@ -393,20 +430,23 @@ function Minesweeper(dim, minePercent){
 		this.timerInterval = setInterval(timerLoop, 1000);
 	}
 
+	// End game
 	this.endGame = function(){
 		clearInterval(this.timerInterval);
 	}
 
+	// Create tiles
 	this.createTiles = function(){
-		for (var i=0; i<this.dim; i++){
+		for (var i=0; i < this.dim; i++){
 			this.tiles.push([]);
-			for (var j=0; j<this.dim; j++){
+			for (var j=0; j < this.dim; j++){
 				var tile = new Tile(i, j, this.xBoard, this.yBoard);
 				this.tiles[i].push(tile);
 			}
 		}
 	}
 
+	// Create mines
 	this.createMines = function(iFirst, jFirst){
 		var excludeCoords = [];
 		excludeCoords.push(String([iFirst, jFirst]));
@@ -415,11 +455,11 @@ function Minesweeper(dim, minePercent){
 			excludeCoords.push(String([surroundingCoords[i][0], surroundingCoords[i][1]]));
 		}
 		var numRemaining = this.numTiles - excludeCoords.length;
-		for (var n=1; n<=this.numMines; n++){
+		for (var n=1; n <= this.numMines; n++){
 			var mineLoc = Math.ceil(Math.random() * numRemaining);
-			var count = 0;
-			for (var i=0; i<this.dim; i++){
-				for (var j=0; j<this.dim; j++){
+			var count   = 0;
+			for (var i=0; i < this.dim; i++){
+				for (var j=0; j < this.dim; j++){
 					if (! this.mines[i][j] & ! excludeCoords.includes(String([i, j]))){
 						count++;
 						if (mineLoc == count){
@@ -430,13 +470,14 @@ function Minesweeper(dim, minePercent){
 				}
 			}
 		}
-		for (var i=0; i<this.dim; i++){
-			for (var j=0; j<this.dim; j++){
+		for (var i=0; i < this.dim; i++){
+			for (var j=0; j < this.dim; j++){
 				this.tiles[i][j].updateMineInfo(this.mines[i][j], this.countSurroundingMines(i, j));
 			}
 		}
 	}
 
+	// Get surrounding coordinates
 	this.getSurroundingCoords = function(i, j){
 		var surroundingCoords = [];
 		if (i-1 >= 0 & j-1 >= 0){
@@ -466,6 +507,7 @@ function Minesweeper(dim, minePercent){
 		return surroundingCoords;
 	}
 
+	// Count surrounding mines
 	this.countSurroundingMines = function(i, j){
 		var count = 0;
 		var surroundingCoords = this.getSurroundingCoords(i, j);
@@ -481,6 +523,7 @@ function Minesweeper(dim, minePercent){
 		return count;
 	}
 
+	// Place flag
 	this.placeFlag = function(i, j){
 		if (! this.tiles[i][j].isSwept){
 			if (! this.tiles[i][j].isPlaced){
@@ -500,9 +543,10 @@ function Minesweeper(dim, minePercent){
 		}
 	}
 
+	// Sweep tile
 	this.sweepTile = function(i, j){
-		if (! this.tiles[i][j].isSwept){
-			if (this.tiles[i][j].isPlaced){
+		if (! this.tiles[i][j].isSwept){ // If the tile is not swept
+			if (this.tiles[i][j].isPlaced){ // If a flag has been placed
 				this.numFlagsRemaining++;
 				this.clearInfobar();
 				this.drawInfobar();
@@ -511,10 +555,10 @@ function Minesweeper(dim, minePercent){
 			this.tiles[i][j].isSwept = true;
 			this.tiles[i][j].clear();
 			this.tiles[i][j].draw();
-			if (this.tiles[i][j].isMine){
+			if (this.tiles[i][j].isMine){ // If the tile is a mine
 				this.gameState = "lose";
-				for (var iTemp=0; iTemp<this.dim; iTemp++){
-					for (var jTemp=0; jTemp<this.dim; jTemp++){
+				for (var iTemp=0; iTemp < this.dim; iTemp++){
+					for (var jTemp=0; jTemp < this.dim; jTemp++){
 						if ((i != iTemp || j != jTemp) & this.mines[iTemp][jTemp]){
 							this.tiles[iTemp][jTemp].isRevealed = true;
 							this.tiles[iTemp][jTemp].clear();
@@ -524,7 +568,7 @@ function Minesweeper(dim, minePercent){
 				}
 				this.clearInfobar();
 				this.drawInfobar();
-			} else {
+			} else { // If the tile is not a mine
 				this.numTilesUnswept--;
 				if (this.tiles[i][j].numSurroundingMines == 0){
 					var surroundingCoords = this.getSurroundingCoords(i, j);
@@ -543,32 +587,37 @@ function Minesweeper(dim, minePercent){
 		}
 	}
 
+	// Check whether game is won
 	this.checkWin = function(){
 		if (this.numTilesUnswept == 0 & this.numFlagsRemaining == 0){
 			this.gameState = "win";
 		}
 	}
 
+	// Clear board
 	this.clearBoard = function(){
-		for (var i=0; i<this.dim; i++){
-			for (var j=0; j<this.dim; j++){
+		for (var i=0; i < this.dim; i++){
+			for (var j=0; j < this.dim; j++){
 				this.tiles[i][j].clear();
 			}
 		}
 	}
 
+	// Draw board
 	this.drawBoard = function(){
-		for (var i=0; i<this.dim; i++){
-			for (var j=0; j<this.dim; j++){
+		for (var i=0; i < this.dim; i++){
+			for (var j=0; j < this.dim; j++){
 				this.tiles[i][j].draw();
 			}
 		}
 	}
 
+	// Clear infobar
 	this.clearInfobar = function(){
 		c4.clearRect(0, 0, INFOBAR_WIDTH, INFOBAR_HEIGHT);
 	}
 
+	// Draw infobar
 	this.drawInfobar = function(){
 		var digit100 = Math.floor(this.numFlagsRemaining/100);
 		var digit10  = Math.floor((this.numFlagsRemaining - digit100 * 100)/10);
@@ -590,8 +639,8 @@ function Minesweeper(dim, minePercent){
         }
 
 		var digit100 = Math.floor(this.timer/100);
-		var digit10 = Math.floor((this.timer - digit100 * 100)/10);
-		var digit1 = this.timer - digit100 * 100 - digit10 * 10;
+		var digit10  = Math.floor((this.timer - digit100 * 100)/10);
+		var digit1   = this.timer - digit100 * 100 - digit10 * 10;
 		c4.drawImage(imgDigits, digit100 * 29, handler.style * 46, 29, 46, this.xTimer + 0 , this.yTimer, 29, 46);
 		c4.drawImage(imgDigits, digit10  * 29, handler.style * 46, 29, 46, this.xTimer + 29, this.yTimer, 29, 46);
 		c4.drawImage(imgDigits, digit1   * 29, handler.style * 46, 29, 46, this.xTimer + 58, this.yTimer, 29, 46);
@@ -605,6 +654,7 @@ Tile
 */
 
 function Tile(r, c, xBoard, yBoard){
+	// Initialize tile
 	this.init = function(){
 		this.r                   = r;
 		this.c                   = c;
@@ -617,15 +667,18 @@ function Tile(r, c, xBoard, yBoard){
 		this.isRevealed          = false;
 	}
 
+	// Update mine information
 	this.updateMineInfo = function(isMine, numSurroundingMines){
 		this.isMine = isMine;
 		this.numSurroundingMines = numSurroundingMines;
 	}
 
+	// Clear tile
 	this.clear = function(){
 		c3.clearRect(this.x, this.y, TILE_DIM, TILE_DIM);
 	}
 
+	// Draw tile
 	this.draw = function(){
 		if (this.isRevealed){
 			c3.drawImage(imgTiles, 330, handler.style * TILE_DIM, TILE_DIM, TILE_DIM, this.x, this.y, TILE_DIM, TILE_DIM);
